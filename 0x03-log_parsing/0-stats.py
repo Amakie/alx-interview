@@ -1,50 +1,49 @@
 #!/usr/bin/python3
-"""script that reads stdin line by line and computes metrics
 """
-
-
+    script that reads stdin line by line and computes metrics
+"""
 import sys
 
-# store the count of all status codes in a dictionary
-status_codes_dict = {'200': 0, '301': 0, '400': 0, '401': 0, '403': 0,
-                     '404': 0, '405': 0, '500': 0}
 
-total_size = 0
-count = 0  # keep count of the number lines counted
+def print_msg(codes, file_size):
+    print("File size: {}".format(file_size))
+    for key, val in sorted(codes.items()):
+        if val != 0:
+            print("{}: {}".format(key, val))
+
+
+file_size = 0
+code = 0
+count_lines = 0
+codes = {
+    "200": 0,
+    "301": 0,
+    "400": 0,
+    "401": 0,
+    "403": 0,
+    "404": 0,
+    "405": 0,
+    "500": 0
+}
 
 try:
     for line in sys.stdin:
-        line_list = line.split(" ")
+        parsed_line = line.split()
+        parsed_line = parsed_line[::-1]
 
-        if len(line_list) > 4:
-            status_code = line_list[-2]
-            file_size = int(line_list[-1])
+        if len(parsed_line) > 2:
+            count_lines += 1
 
-            # check if the status code receive exists in the dictionary and
-            # increment its count
-            if status_code in status_codes_dict.keys():
-                status_codes_dict[status_code] += 1
+            if count_lines <= 10:
+                file_size += int(parsed_line[0])
+                code = parsed_line[1]
 
-            # update total size
-            total_size += file_size
+                if (code in codes.keys()):
+                    codes[code] += 1
 
-            # update count of lines
-            count += 1
-
-        if count == 10:
-            count = 0  # reset count
-            print('File size: {}'.format(total_size))
-
-            # print out status code counts
-            for key, value in sorted(status_codes_dict.items()):
-                if value != 0:
-                    print('{}: {}'.format(key, value))
-
-except Exception as err:
-    pass
+            if (count_lines == 10):
+                print_msg(codes, file_size)
+                count_lines = 0
 
 finally:
-    print('File size: {}'.format(total_size))
-    for key, value in sorted(status_codes_dict.items()):
-        if value != 0:
-            print('{}: {}'.format(key, value))
+    print_msg(codes, file_size)
