@@ -1,4 +1,4 @@
-#!/usr/bin/python3 env
+#!/usr/bin/env python3
 """change making problem"""
 
 
